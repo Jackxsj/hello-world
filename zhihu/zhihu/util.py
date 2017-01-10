@@ -18,7 +18,12 @@ class MyParse(object):
     """
     def __init__(self):
         cf = ConfigParser.ConfigParser()
-        cf.read("/home/wang/python/scrapy/zhihu/zhihu/config.ini")
+        #参考http://blog.csdn.net/gexiaobaohelloworld/article/details/7976944
+        #读写配置文件，这个配置文件的路径使用\\来确定
+        cf.read("D:\\soft\\python\\zhihu_self\\hello-world\\zhihu\\zhihu\\config.ini")
+        sections = cf.sections()  
+        print 'sections:', sections
+        
         self.topic = cf.get("setting", "topic")
         self.pages = cf.getint("setting", "pages")
         self.zan_th = cf.getint("setting", "zan_th")
@@ -30,23 +35,30 @@ class MyParse(object):
         conn = MySQLdb.connect(
             host='localhost',
             user = 'root',
-            passwd = '',
+            passwd = 'root',
             port = 3306)
         cur = conn.cursor()
         conn.select_db('zhihu')
-        
-        cur.execute('select * from topic where topic = %s', self.topic)
+
+        #这里的第二个参数需要用[]包围，因为这个传入的要求必须是数组，多个参数的话用,分割
+        #http://stackoverflow.com/questions/21740359/python-mysqldb-typeerror-not-all-arguments-converted-during-string-formatting
+        cur.execute('select * from topic where topic = %s', [self.topic])
         result = cur.fetchall()
+        print self.topic.decode('utf-8')
         
         self.link_id = result[0][0]
-        self.topic_url = 'http://www.zhihu.com/topic/%s/questions/' % self.link_id
-        
+        self.topic_url = 'http://www.zhihu.com/topic/%s/top-answers/' % self.link_id
+        #打印结果为 http://www.zhihu.com/topic/19556758/questions/
+        #上面的那个结果为待回答问题，如果选择top或者hot结尾分别为精华或者热门
+        print self.topic_url.decode('utf-8')
+
         if cmp(self.topic, '电影') == 0:
             self.table = 'movie'
         elif cmp(self.topic, '编程') == 0:
             self.table = 'coding'
         else:
             self.table = 'table%s' % self.link_id
+            print self.table.decode('utf-8')
         
         cur.close()
         conn.close()

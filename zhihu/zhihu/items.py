@@ -7,7 +7,7 @@
 
 import scrapy
 
-
+#这个是从scrapy的类衍生出来
 class ZhihuItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()

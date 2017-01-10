@@ -20,7 +20,7 @@ class ZhihuPipeline(object):
         self.conn = MySQLdb.connect(
                 host = 'localhost',
                 user='root',
-                passwd='',
+                passwd='root',
                 port=3306)
         self.cur = self.conn.cursor()
         try:
@@ -29,6 +29,7 @@ class ZhihuPipeline(object):
             print 'Mysql error %d: %s' % (e.args[0], e.args[1])
         self.conn.select_db('zhihu')
         try:
+            print 'create table here'
             self.cur.execute('create table %s(aid int, zan int,  publish_time int, title varchar(512), content varchar(5120), PRIMARY KEY (aid))' % ZhihuSpider.my_parse.table) # 主键
         except MySQLdb.Error, e:
             print 'Mysql error %d: %s' % (e.args[0], e.args[1])
@@ -42,6 +43,7 @@ class ZhihuPipeline(object):
         res_dict = dict(item)
         value = []
         for it in res_dict:
+            print 'process_item dealing here.........'
             print it
             if cmp(it, 'content') == 0 or cmp(it, 'title') == 0:
                 reslut = re.findall("'(.*?)'", repr(res_dict[it]).decode('unicode_escape').encode('utf-8'), re.S)
@@ -70,5 +72,6 @@ class ZhihuPipeline(object):
         return item
         
     def close_spider(self, spider):
-        GetInteresting().start()
+       # GetInteresting().start()
+       print 'close'
     

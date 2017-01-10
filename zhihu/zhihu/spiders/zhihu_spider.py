@@ -17,22 +17,30 @@ class ZhihuSpider(CrawlSpider):
     allowed_domains = ['zhihu.com']
     rules = [
         Rule(sle(allow = ('/question/\d+$', )), callback = 'prase_info', follow = False),
-        Rule(sle(allow = ('\?page=\d{0,%s}$' % my_parse.pages, )), follow = True),
-        Rule(sle(allow = ('/%s/questions/$' % my_parse.link_id, )), follow = True),
+        #Rule(sle(allow = ('\?page=\d{0,%s}$' % my_parse.pages, )), follow = True),
+        #Rule(sle(allow = ('/%s/questions/$' % my_parse.link_id, )), follow = True),
     ]
     
     #def parse(self, response): 
     #    print response.body
        
-    
+    #http://blog.csdn.net/dawnranger/article/details/50037703
+    #这个selector需要判断是如何使用的
     def prase_info(self, response):
         """解析回答信息"""
+        print 'matched and called parse_info here'
         sel = Selector(response)
+        print response
         tmp_title = sel.xpath('//title/text()').extract()
-        for sel in response.xpath('//div[@class="zm-item-answer "]'):
+        print 'begin to check the title info here'
+        print tmp_title[0]
+        #更改下面的class
+        for sel in response.xpath('//div[@class="zm-editable-content clearfix"]'):
             item = ZhihuItem()
             item['title'] = tmp_title
             item['content'] = sel.xpath('div[@data-action]/div/text()').extract()
+            print 'check the content fetched or not'
+            print item['content']
             item['zan'] = sel.xpath('div/button/span[@class="count"]/text()').extract()
             item['publish_time'] = sel.xpath('@data-created').extract()
             item['aid'] = sel.xpath('@data-aid').extract()
