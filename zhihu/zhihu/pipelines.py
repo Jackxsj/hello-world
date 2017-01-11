@@ -13,6 +13,7 @@ import MySQLdb
 from zhihu.spiders.zhihu_spider import *
 from zhihu.getInteresting import *
 
+
 class ZhihuPipeline(object):
     def __init__(self):
         # self.write_file = codecs.open('out.json', 'wb', 'utf-8')
