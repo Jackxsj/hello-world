@@ -47,7 +47,7 @@ class MyParse(object):
         print self.topic.decode('utf-8')
         
         self.link_id = result[0][0]
-        self.topic_url = 'http://www.zhihu.com/topic/%s/top-answers/?page=1' % '20011671'
+        self.topic_url = 'http://www.zhihu.com/topic/%s/top-answers' % self.link_id
         #打印结果为 http://www.zhihu.com/topic/19556758/top-answers/
         #上面的那个结果为待回答问题，如果选择top或者hot结尾分别为精华或者热门
         print self.topic_url.decode('utf-8')

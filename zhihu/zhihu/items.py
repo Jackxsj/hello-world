@@ -16,3 +16,8 @@ class ZhihuItem(scrapy.Item):
     zan = scrapy.Field() # 赞同人数
     publish_time = scrapy.Field() # 发布时间
     aid = scrapy.Field() # 该回答的唯一ID
+
+class detailQuestionItem(scrapy.Item):
+    title = scrapy.Field()
+    url_link = scrapy.Field()
+    qid = scrapy.Field()

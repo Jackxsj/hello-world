@@ -16,12 +16,13 @@ class ZhihuSpider(CrawlSpider):
     name = 'zhihu'
     start_urls = [ my_parse.topic_url ]
     allowed_domains = ['zhihu.com']
+    print my_parse.pages
     rules = [
         #测试，把下面的这个Rule注释掉，并设置follow=true，在新的链接里parse
         #Rule(sle(allow = ('/question/\d+$', )), callback = 'prase_info', follow = False),
-        Rule(sle(allow = ('/question/\d+$', )), process_request='parse_feature',follow = True),
-        Rule(sle(allow = ('\?sort=created&page=\d+$',)), callback = 'prase_info', follow = False),
+        Rule(sle(allow = ('/question/\d+$', )), callback= 'prase_test',process_request='parse_feature',follow = False),
         #Rule(sle(allow = ('\?page=\d{0,%s}$' % my_parse.pages, )), follow = True),
+        Rule(sle(allow = ('\?page=[1-2]$', )), follow = True),
         #Rule(sle(allow = ('/%s/questions/$' % my_parse.link_id, )), follow = True),
     ]
     #/question/\d+\?sort=created&page=\d+$
@@ -55,6 +56,37 @@ class ZhihuSpider(CrawlSpider):
             # 赞大于zan_th的回答才是需要的
             if int(zan_str.group(1)) >= ZhihuSpider.my_parse.zan_th:
                 yield item
+                
+    def prase_test2(self,response):
+        print 'get response here'
+        print 'request url is'
+        sel = Selector(response)
+        temp_title = sel.xpath('//title/text()').extract()
+        for sel in response.xpath('//div[@class="zg-wrap zu-main clearfix with-indention-votebar"]'):
+            print 'matched in sel...'
+            item = detailQuestionItem()
+            item['title'] = temp_title
+            item['qid'] = sel.xpath('//@data-urltoken').extract()        
+            item['url_link'] = response.url
+            print item['title']
+            print item['url_link']
+            print item['qid']
+        
+    def prase_test(self,response):
+        print 'get response here'
+        print 'request url is'
+        sel = Selector(response)
+        item = detailQuestionItem()
+        item['title'] = (sel.xpath('//title/text()').extract())[0]
+        item['qid'] = (sel.xpath('//div[@class="zg-wrap zu-main clearfix with-indention-votebar"]/@data-urltoken').extract())[0]
+        item['url_link'] = response.url
+        print item['title']
+        print item['url_link']
+        print item['qid']
+        return item
+        
+        
+        
     def parse_feature(self,request):
         print 'test add_feature here...........'
         original_url = request.url
