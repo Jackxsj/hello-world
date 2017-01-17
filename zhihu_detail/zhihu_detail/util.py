@@ -60,12 +60,25 @@ class MyParse(object):
         cur.execute(sql_cmd)
         res_all = cur.fetchall()
         self.url_link = []
+        #记录aid
+        self.aid=[]
         for ii in res_all:
             self.url_link.append(ii[4])
+            self.aid.append(ii[0])
         print self.url_link
+        print self.aid
 
         #后面还要在这里创建那个供返回数据写入的表
-        
+        for ij in self.aid:
+            table_name = 'q%s'%ij
+            try:
+                sql_exe = 'create table if not exists '+ table_name+'(qid int not null, aid int not null, zan_num int, people varchar(128), people_url varchar(128), content varchar(16384),img_link varchar(512), pb1 int, pb2 varchar(512), PRIMARY KEY (aid))'
+                print sql_exe
+                cur.execute(sql_exe) # 主键
+                print 'Create table success'
+            except MySQLdb.Error, e:
+                print 'Mysql error %d: %s' % (e.args[0], e.args[1])
+
         cur.close()
         conn.close()
         
