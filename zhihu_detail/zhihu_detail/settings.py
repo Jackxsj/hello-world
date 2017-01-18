@@ -10,7 +10,8 @@
 #     http://scrapy.readthedocs.org/en/latest/topics/spider-middleware.html
 
 BOT_NAME = 'zhihu_detail'
-
+DOWNLOAD_DELAY = 2
+CONCURRENT_REQUESTS_PER_DOMAIN = 2
 SPIDER_MODULES = ['zhihu_detail.spiders']
 NEWSPIDER_MODULE = 'zhihu_detail.spiders'
 

@@ -32,7 +32,8 @@ class MyParse(object):
             host='localhost',
             user = 'root',
             passwd = 'root',
-            port = 3306)
+            port = 3306,
+            charset='utf8')
         cur = conn.cursor()
         conn.select_db('zhihu')
 
@@ -63,7 +64,7 @@ class MyParse(object):
         #记录aid
         self.aid=[]
         for ii in res_all:
-            self.url_link.append(ii[4])
+            self.url_link.append(ii[4].encode('utf-8'))
             self.aid.append(ii[0])
         print self.url_link
         print self.aid
@@ -72,7 +73,7 @@ class MyParse(object):
         for ij in self.aid:
             table_name = 'q%s'%ij
             try:
-                sql_exe = 'create table if not exists '+ table_name+'(qid int not null, aid int not null, zan_num int, people varchar(128), people_url varchar(128), content varchar(16384),img_link varchar(512), pb1 int, pb2 varchar(512), PRIMARY KEY (aid))'
+                sql_exe = 'create table if not exists '+ table_name+'(qid int not null, aid int not null, zan_num int, people varchar(128), people_url varchar(128), content text,img_link varchar(4096), pb1 int, pb2 varchar(512), PRIMARY KEY (aid))'
                 print sql_exe
                 cur.execute(sql_exe) # 主键
                 print 'Create table success'

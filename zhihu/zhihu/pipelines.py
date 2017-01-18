@@ -22,10 +22,11 @@ class ZhihuPipeline(object):
                 host = 'localhost',
                 user='root',
                 passwd='root',
-                port=3306)
+                port=3306,
+                charset='utf8')
         self.cur = self.conn.cursor()
         try:
-            self.cur.execute('create database if not exists zhihu')
+            self.cur.execute('create database if not exists zhihu DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci')
         except MySQLdb.Error, e:
             print 'Mysql error %d: %s' % (e.args[0], e.args[1])
         self.conn.select_db('zhihu')
