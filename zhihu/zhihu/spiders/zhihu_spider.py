@@ -12,7 +12,7 @@ from scrapy.http import Request
 
 class ZhihuSpider(CrawlSpider):
     my_parse = MyParse()
-    download_delay = 0.8
+    download_delay = 1.2
     name = 'zhihu'
     start_urls = [ my_parse.topic_url ]
     allowed_domains = ['zhihu.com']
@@ -22,7 +22,7 @@ class ZhihuSpider(CrawlSpider):
         #Rule(sle(allow = ('/question/\d+$', )), callback = 'prase_info', follow = False),
         Rule(sle(allow = ('/question/\d+$', )), callback= 'prase_test',process_request='parse_feature',follow = False),
         #Rule(sle(allow = ('\?page=\d{0,%s}$' % my_parse.pages, )), follow = True),
-        Rule(sle(allow = ('\?page=[1-2]$', )), follow = True),
+        Rule(sle(allow = ('\?page=([1-4]?\d|50)$', )), follow = True),
         #Rule(sle(allow = ('/%s/questions/$' % my_parse.link_id, )), follow = True),
     ]
     #/question/\d+\?sort=created&page=\d+$
