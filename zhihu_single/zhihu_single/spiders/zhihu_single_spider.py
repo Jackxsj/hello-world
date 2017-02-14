@@ -6,27 +6,21 @@ from scrapy.contrib.spiders import CrawlSpider, Rule
 from scrapy.contrib.linkextractors.sgml import SgmlLinkExtractor as sle
 
 #保证引用正确，否则会出现找不到spider的情况
-from zhihu_detail.items import *
-from zhihu_detail.util import *
+from zhihu_single.items import *
+from zhihu_single.util import *
 #引入request的选项方便修改http请求
 from scrapy.http import Request
 #power shell 日志命令
 #Start-Transcript -path d:\soft\python\powershelllog.txt -Force -Append –NoClobber
-class ZhihuDetailSpider(CrawlSpider):
+class ZhihuSingleSpider(CrawlSpider):
     my_parse = MyParse()
     #这个必须小写，能够控制每个request的抓取时间
     download_delay = 2 
-    name = 'zhihu_detail'
-
-    use_link_from_my_parse = True;
-    if use_link_from_my_parse:
-        #如果使用util带过来的很多连接，start_urls等于下面的
-        start_urls = my_parse.url_link
-    else:
+    name = 'zhihu_single'
     #如果需要单独收集某一个问题的使用下面这个start_urls,注意table名字是 q19555712 类型，前面有字母q
-        start_urls = ['https://www.zhihu.com/question/19555712?sort=created']
-
-
+#    start_urls = ['https://www.zhihu.com/question/19555712?sort=created']
+    #如果使用util带过来的很多连接，start_urls等于下面的
+    start_urls = my_parse.url_link
     print my_parse.url_link
     
     allowed_domains = ['zhihu.com']
@@ -40,7 +34,7 @@ class ZhihuDetailSpider(CrawlSpider):
     def start_requests(self):
             for url in self.start_urls:
                 print(url)
-                for i in range(0,10):
+                for i in range(1,50):
                     tmp_url = url+'&page='+str(i)
                     yield Request(tmp_url, callback = self.prase_info)
                 
@@ -52,7 +46,7 @@ class ZhihuDetailSpider(CrawlSpider):
         print tmp_qid
         #使用//注意是从根节点开始定义，这里已经用sel过滤一次后，内循环不需要/
         for sel in response.xpath('//div[@class="zm-item-answer  zm-item-expanded"]'):
-            item = ZhihuDetailItem()
+            item = ZhihuSingleItem()
             item['qid'] = tmp_qid
             print item['qid']
             item['aid'] = (sel.xpath('@data-atoken').extract())[0]
@@ -76,12 +70,7 @@ class ZhihuDetailSpider(CrawlSpider):
 
             tmp_content=''.join(sel.xpath('div/div[@class="zm-editable-content clearfix"]/node()').extract())
             item['content'],num = re.subn('<br>','\\n',tmp_content)
-            print item['content'].__class__
-            #TODO: 看下为什么不能打出下面的img链接---完成：有些位于block里面
-            #TODO2: 返回item-------完成：使用yield item
-            #TODO3: myParse 创建表
-            #TODO4: itemPipline写入
-            #TODO5: 测试
+            
             tmp_img_link = ''
             for sel_img in sel.xpath('div/div[@class="zm-editable-content clearfix"]/img'):
                 if sel_img.xpath('@data-original'):
@@ -93,8 +82,7 @@ class ZhihuDetailSpider(CrawlSpider):
                 item['img_link']=tmp_img_link.encode('utf-8')
             else:
                 item['img_link']=tmp_img_link
-            #这个是str 类型，即本来就是utf-8的类型
-            print item['img_link'].__class__
+            
             
 
             # 赞大于zan_th的回答才是需要的

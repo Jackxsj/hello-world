@@ -81,7 +81,8 @@ if __name__ == "__main__":
             charset='utf8')
     cur = conn.cursor()
     conn.select_db('zhihu')
-    cur.execute('select * from q54884330');
+    sek = 'q20347860'
+    cur.execute('select * from %s' %sek);
     num_fields = len(cur.description)
     field_names = [i[0] for i in cur.description]
     
@@ -104,7 +105,7 @@ if __name__ == "__main__":
         sheet1.write(row_j,6,ii[6],set_style('Arial',220,False))
         row_j=row_j+1
 
-    wbk.save('demo1.xlsx')
+    wbk.save('%s.xlsx' %sek)
 
     cur.close()
     conn.close()

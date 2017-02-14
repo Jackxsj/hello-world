@@ -27,7 +27,7 @@ class ZhihuTopicPipeline(object):
             print 'Mysql error %d: %s' % (e.args[0], e.args[1])
         self.conn.select_db('zhihu')
         try:
-            self.cur.execute('create table topic(link_id int, followers int,topic varchar(64), paren_topic varchar(256), child_topic varchar(256), PRIMARY KEY (link_id))') # 主键
+            self.cur.execute('create table if not exists topic(link_id int, followers int,topic varchar(64), paren_topic varchar(256), child_topic varchar(256), PRIMARY KEY (link_id))') # 主键
             print 'Create table success'
         except MySQLdb.Error, e:
             print 'Mysql error %d: %s' % (e.args[0], e.args[1])

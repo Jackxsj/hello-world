@@ -46,8 +46,13 @@ class MyParse(object):
         cur.execute('select * from topic where topic = %s', [self.topic])
         result = cur.fetchall()
         print self.topic.decode('utf-8')
-        
-        self.link_id = result[0][0]
+        #！！！！这里修改那个self.link_id用来改正要爬的内容，人工修改！！！
+        use_topic_from_db = False;
+        self.link_id = ''
+        if use_topic_from_db:
+            self.link_id = result[0][0]
+        else:
+            self.link_id = '19551271';
         self.topic_url = 'http://www.zhihu.com/topic/%s/top-answers' % self.link_id
         #打印结果为 http://www.zhihu.com/topic/19556758/top-answers/
         #上面的那个结果为待回答问题，如果选择top或者hot结尾分别为精华或者热门

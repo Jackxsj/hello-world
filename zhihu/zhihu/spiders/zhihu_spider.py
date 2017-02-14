@@ -22,6 +22,7 @@ class ZhihuSpider(CrawlSpider):
         #Rule(sle(allow = ('/question/\d+$', )), callback = 'prase_info', follow = False),
         Rule(sle(allow = ('/question/\d+$', )), callback= 'prase_test',process_request='parse_feature',follow = False),
         #Rule(sle(allow = ('\?page=\d{0,%s}$' % my_parse.pages, )), follow = True),
+        #Rule(sle(allow = ('\?page=([1-2])$', )), follow = True),
         Rule(sle(allow = ('\?page=([1-4]?\d|50)$', )), follow = True),
         #Rule(sle(allow = ('/%s/questions/$' % my_parse.link_id, )), follow = True),
     ]
@@ -32,6 +33,7 @@ class ZhihuSpider(CrawlSpider):
        
     #http://blog.csdn.net/dawnranger/article/details/50037703
     #这个selector需要判断是如何使用的
+    #这个是回来匹配上的就会去收集
     def prase_info(self, response):
         """解析回答信息"""
         print 'matched and called parse_info here'
@@ -41,7 +43,7 @@ class ZhihuSpider(CrawlSpider):
         print tmp_title[0]
         for sel in response.xpath('//div[@class="zm-item-answer  zm-item-expanded"]'):
             item = ZhihuItem()
-            item['title'] = tmp_title
+            item['title'] = tmp_title[0].encode('utf-8')
             item['content'] = sel.xpath('div[@data-action]/div/text()').extract()
             print 'check the content fetched or not'
             item['zan'] = sel.xpath('div/button/span[@class="count"]/text()').extract()
@@ -77,7 +79,7 @@ class ZhihuSpider(CrawlSpider):
         print 'request url is'
         sel = Selector(response)
         item = detailQuestionItem()
-        item['title'] = (sel.xpath('//title/text()').extract())[0]
+        item['title'] = ((sel.xpath('//title/text()').extract())[0])
         item['qid'] = (sel.xpath('//div[@class="zg-wrap zu-main clearfix with-indention-votebar"]/@data-urltoken').extract())[0]
         item['url_link'] = response.url
         print item['title']

@@ -13,12 +13,12 @@ class TopicSpider(CrawlSpider):
     name = 'topic'
     #start_urls = ['http://www.zhihu.com/topic/19776749']
     #使用下面的知识管理作为首先测试的环节，这个其实只是设置目录
-    start_urls = ['https://www.zhihu.com/topic/19556758']
+    start_urls = ['https://www.zhihu.com/topic/19551271']
     allowed_domains = ['zhihu.com']
     #先注释下面的parse全部，只parse这个topic下的；另外注意callback后面的方法名不能使用parse，需要用具体的名字
     #http://www.jianshu.com/p/83c73071d3cb
     #rules = [Rule(sle(allow = ('/topic/\d+$', )), callback = 'parse_topic', follow = True),]
-    rules = [Rule(sle(allow = ('/topic/19556758$', )), callback = 'parse_topic', follow = True),]
+    rules = [Rule(sle(allow = ('/topic/19551271$', )), callback = 'parse_topic', follow = True),]
     
     def parse_topic(self, response):
         sel = Selector(response)

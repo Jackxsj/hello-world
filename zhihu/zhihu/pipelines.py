@@ -32,7 +32,7 @@ class ZhihuPipeline(object):
         self.conn.select_db('zhihu')
         try:
             print 'create table here'
-            self.cur.execute('create table %s(aid int, zan int,  publish_time int, title varchar(512), content varchar(5120), PRIMARY KEY (aid))' % ZhihuSpider.my_parse.table) # 主键
+            self.cur.execute('create table  if not exists %s(aid int, zan int,  publish_time int, title varchar(512), content varchar(5120), PRIMARY KEY (aid))' % ZhihuSpider.my_parse.table) # 主键
         except MySQLdb.Error, e:
             print 'Mysql error %d: %s' % (e.args[0], e.args[1])
     def process_item(self,item,spider):
@@ -41,7 +41,6 @@ class ZhihuPipeline(object):
         print 'res_dict is:'
         print res_dict
         for it in res_dict:
-            print 'processing defined by Jack'
             if cmp(it,'qid')==0:
                 result = re.search("\d+",str(res_dict[it]))
                 #print 'result is'
@@ -50,15 +49,7 @@ class ZhihuPipeline(object):
                 value.append(0)
                 value.append(0)
             elif cmp(it, 'url_link') == 0 or cmp(it, 'title') == 0:
-                reslut = re.findall("'(.*?)'", repr(res_dict[it]),re.S)
-                res_str = ''
-                for i in reslut:
-                    res_str = '%s%s' % (res_str, i)
-                
-                # 打印出问题。
-                #print 'res_str is as followed:'
-                #print res_str.decode('utf-8')
-                value.append(res_str)
+                value.append(res_dict[it])
         value[3],value[4] = value[4],value[3]
         value.append(0)
         print value
