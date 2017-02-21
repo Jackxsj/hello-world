@@ -24,7 +24,7 @@ class ZhihuDetailSpider(CrawlSpider):
         start_urls = my_parse.url_link
     else:
     #如果需要单独收集某一个问题的使用下面这个start_urls,注意table名字是 q19555712 类型，前面有字母q
-        start_urls = ['https://www.zhihu.com/question/19555712?sort=created']
+        start_urls = ['https://www.zhihu.com/question/19800937?sort=created']
 
 
     print my_parse.url_link

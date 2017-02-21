@@ -27,8 +27,8 @@ class ZhihuTopicPipeline(object):
             print 'Mysql error %d: %s' % (e.args[0], e.args[1])
         self.conn.select_db('zhihu')
         try:
-            self.cur.execute('create table if not exists topic(link_id int, followers int,topic varchar(64), paren_topic varchar(256), child_topic varchar(256), PRIMARY KEY (link_id))') # 主键
-            print 'Create table success'
+            # 主键
+            self.cur.execute('create table if not exists topic(link_id int, followers int,topic varchar(64), paren_topic varchar(256), child_topic varchar(256), PRIMARY KEY (link_id))') 
         except MySQLdb.Error, e:
             print 'Mysql error %d: %s' % (e.args[0], e.args[1])
 
@@ -48,8 +48,8 @@ class ZhihuTopicPipeline(object):
             
         value[0],value[1],value[2],value[3],value[4] = value[4],value[3],value[0],value[1],value[2]
         
-        # 关注人数少于2000 不存储
-        if value[1] == '' or long(value[1]) < 2000:
+        # 关注人数少于2000 不存储，这里调整为100
+        if value[1] == '' or long(value[1]) < 100:
             return item
         
         # 只更新关注人数
@@ -59,6 +59,7 @@ class ZhihuTopicPipeline(object):
             self.cur.execute('insert into topic values(%s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE followers=%s', value)
             #这里需要自己进行commit否则不会写入数据
             self.conn.commit()
+            
         except MySQLdb.Error, e:
             print 'Mysql error %d: %s' % (e.args[0], e.args[1])
         print 'finish one item here.......................'

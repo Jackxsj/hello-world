@@ -18,13 +18,17 @@ class ZhihuSpider(CrawlSpider):
     allowed_domains = ['zhihu.com']
     print my_parse.pages
     rules = [
-        #测试，把下面的这个Rule注释掉，并设置follow=true，在新的链接里parse
+        #测试!!!，把下面的这个Rule注释掉，并设置follow=true，在新的链接里parse
         #Rule(sle(allow = ('/question/\d+$', )), callback = 'prase_info', follow = False),
-        Rule(sle(allow = ('/question/\d+$', )), callback= 'prase_test',process_request='parse_feature',follow = False),
-        #Rule(sle(allow = ('\?page=\d{0,%s}$' % my_parse.pages, )), follow = True),
-        #Rule(sle(allow = ('\?page=([1-2])$', )), follow = True),
-        Rule(sle(allow = ('\?page=([1-4]?\d|50)$', )), follow = True),
         #Rule(sle(allow = ('/%s/questions/$' % my_parse.link_id, )), follow = True),
+        #测试结束
+        
+        #这个是给那个链接加上？sort=created, 这里有两个调用方法，这里用来终结，不再继续爬取，所以这里的rules控制了爬取过程
+        Rule(sle(allow = ('/question/\d+$', )), callback= 'prase_test',process_request='parse_feature',follow = False),
+        #从1-2页，这里利用了scrapy自己的特性即爬取每一页上面的链接，这里用来控制一共有几页，上面的那个callback和process_request是终结，不再继续爬取
+        Rule(sle(allow = ('\?page=([1-2])$', )), follow = True),
+        #从1-50页
+        #Rule(sle(allow = ('\?page=([1-4]?\d|50)$', )), follow = True),
     ]
     #/question/\d+\?sort=created&page=\d+$
     
@@ -60,7 +64,7 @@ class ZhihuSpider(CrawlSpider):
                 yield item
                 
     def prase_test2(self,response):
-        print 'get response here'
+        print 'get response here2'
         print 'request url is'
         sel = Selector(response)
         temp_title = sel.xpath('//title/text()').extract()
@@ -75,7 +79,7 @@ class ZhihuSpider(CrawlSpider):
             print item['qid']
         
     def prase_test(self,response):
-        print 'get response here'
+        print 'get response here1'
         print 'request url is'
         sel = Selector(response)
         item = detailQuestionItem()
