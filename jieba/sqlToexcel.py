@@ -81,7 +81,7 @@ if __name__ == "__main__":
             charset='utf8')
     cur = conn.cursor()
     conn.select_db('zhihu')
-    sek = 'q28697268'
+    sek = 'q27509573'
     cur.execute('select * from %s' %sek);
     num_fields = len(cur.description)
     field_names = [i[0] for i in cur.description]
