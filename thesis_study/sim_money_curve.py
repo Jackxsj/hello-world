@@ -9,9 +9,15 @@ Created on Sun Feb 26 17:51:35 2017
 import matplotlib.pyplot as plt
 import random
 import matplotlib.font_manager as fm
+from pylab import mpl
+#mpl.rcParams['font.sans-serif'] = ['FangSong'] # 指定默认字体
+#mpl.rcParams['axes.unicode_minus'] = False
 #myfont = fm.FontProperties(fname='/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc') 
             
- 
+#refer below 2 link for this issue:
+#https://my.oschina.net/cppblog/blog/10300
+#http://blog.csdn.net/dgatiger/article/details/50414549
+
 T = 100.0
 N_year = 101
 x_t = [i for i in range (1,N_year)]
@@ -54,6 +60,7 @@ plt.xlabel('time')
 plt.ylabel('cost')
 
 #plt.title(u'显示中文',fontproperties=myfont)
+plt.title(u'显示中文')
 plt.show()
 
 

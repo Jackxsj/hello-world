@@ -4,10 +4,10 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 #测试t(r)
-#传入这个beta 和yta参数
-yta = 3
-beta = 1.4
-#这个是模拟’电力设备管理中‘那个论文里面的数据
+#测试输入数据
+yta = 3183.73679109
+beta =  2.74858658356
+
 t=0
 last_t =[[]*4 for i in range(0,11)]
 for i in range(0,11):
@@ -24,36 +24,24 @@ for i in range(0,11):
 for j in last_t:
     print str(j[0])+'<---->'+str(j[1])+'<---->'+str(j[2])+'<---->'+str(j[3])
 
-
-year_repair = [0 for i in range(0,10)]
+total_y = 15
+year_repair = [0 for i in range(0,total_y)]
 print year_repair
+cmp_year = [i*8760 for i in range(1,total_y+1)]
 for i in range(0,10000):
     t=0
-    while t<10:
+    while t<cmp_year[-1]:
         tmp_val = random.uniform(0,1)
         t1 = yta*((np.log(1/(1-tmp_val)))**(1/beta))
         t = t + t1
-        if t < 1:
-            year_repair[0] = year_repair[0] + 1
-        elif t < 2:
-            year_repair[1] = year_repair[1] + 1
-        elif t < 3:
-            year_repair[2] = year_repair[2] + 1
-        elif t < 4:
-            year_repair[3] = year_repair[3] + 1
-        elif t < 5:
-            year_repair[4] = year_repair[4] + 1
-        elif t < 6:
-            year_repair[5] = year_repair[5] + 1
-        elif t < 7:
-            year_repair[6] = year_repair[6] + 1
-        elif t < 8:
-            year_repair[7] = year_repair[7] + 1
-        elif t < 9:
-            year_repair[8] = year_repair[8] + 1
-        elif t < 10:
-            year_repair[9] = year_repair[9] + 1
+        
+        for j in range(0,total_y):
+            if t < cmp_year[j]:
+                year_repair[j] = year_repair[j] + 1
+                break;
 print year_repair
+#一年的时间会覆盖所有的故障点，所以故障会发生几次
+    
 
 ra = [[755555,80000,0.0291,69840,698.4,906093]]
 ra.append([755555,80000,0.0379,90960,909.6,927425])

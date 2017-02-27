@@ -10,25 +10,26 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 dat = []
-ex_dat = [1138,1209,1288,1362,1483,1602,1723,1865,2038,2176,2329,2398,2512,2638,2760,2906,3155,3270,3319,3448,3521,3608,3682,3823,3965,4080,4163,4295,4371,4520]
+ex_dat = [460,824,150,264,938,1248,543,1378,1726,558,1988,548,2045,546,542,2234,2628,537,1901,3498]
 ex_dat.sort()
 for i in ex_dat:
     dat.append(i)
 
 dat_len = len(dat)
 
-plt.figure(1)
 x = [i for i in range(1,dat_len+1)]
-
-plt.plot(x,dat)
+print 'ex_dat is here: '
+print ex_dat
     
 #test with select sequence, should begin with real number such as 1
+#案例中的求秩如果数据残缺可以用下面这种跳位方式计算
 #sel_n = [1,4,6,10,11,13,16,18,20,23,25,27,30]
+#不跳位，直接计算
 sel_n = [n for n in range(1,dat_len+1)]
 
-
+#计算实际的在list中的下标
 y = [ j for j in range(0,len(sel_n))]
-print y
+
 A_exp = []
 #按照改进的中位秩公式来计算对应的秩次
 for l in y:
@@ -42,6 +43,8 @@ for l in y:
 Fnt = []
 for n in y:
     Fnt.append((A_exp[n]-0.3)/(len(dat)+0.4))
+print 'Fnt is here:'
+print Fnt
 #来计算对应的ln(t) ln(ln(1/(1-F)))用来拟合
 x_t = [np.log(dat[h-1]) for h in sel_n]
 print x_t
