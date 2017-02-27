@@ -10,8 +10,8 @@ import matplotlib.pyplot as plt
 import random
 import matplotlib.font_manager as fm
 from pylab import mpl
-#mpl.rcParams['font.sans-serif'] = ['FangSong'] # 指定默认字体
-#mpl.rcParams['axes.unicode_minus'] = False
+mpl.rcParams['font.sans-serif'] = ['FangSong'] # 指定默认字体
+mpl.rcParams['axes.unicode_minus'] = False
 #myfont = fm.FontProperties(fname='/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc') 
             
 #refer below 2 link for this issue:
@@ -52,15 +52,15 @@ s.decode('gbk', 'replace')
 print s
 
 plt.plot(x_t,T_avg,'--',label=u'初始投资年平均')
-plt.plot(x_t,T_m,'-.')
-plt.plot(x_t,T_t,'-')
+plt.plot(x_t,T_m,'-.',label=u'维护费用年平均')
+plt.plot(x_t,T_t,'-',label=u'年平均成本')
 plt.plot(x_conf,y_conf,'r:')
 plt.legend(loc='upper left')
-plt.xlabel('time')
-plt.ylabel('cost')
+plt.xlabel(u'时间')
+plt.ylabel(u'成本')
 
-#plt.title(u'显示中文',fontproperties=myfont)
-plt.title(u'显示中文')
+
+plt.title(u'LCC年均成本')
 plt.show()
 
 
