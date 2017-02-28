@@ -8,9 +8,9 @@ Created on Sun Feb 26 10:04:14 2017
 import numpy as np
 
 import matplotlib.pyplot as plt
-
+#测试
 dat = []
-ex_dat = [460,824,150,264,938,1248,543,1378,1726,558,1988,548,2045,546,542,2234,2628,537,1901,3498]
+ex_dat = [35,108,168,221,277,346,374,480,550,694,780,925,1306,1429,1542,1753,1856,2269,2485,2940,3278,3804,4200,4306]
 ex_dat.sort()
 for i in ex_dat:
     dat.append(i)
@@ -38,7 +38,8 @@ for l in y:
     else:
         m = A_exp[l-1]+(len(dat)+1-A_exp[l-1])/(len(dat)-sel_n[l]+2.0)
         A_exp.append(m)
-
+print 'A_exp value is :'
+print A_exp
 #用经验公式来计算Fn(t)来找到对应的概率
 Fnt = []
 for n in y:
@@ -47,9 +48,8 @@ print 'Fnt is here:'
 print Fnt
 #来计算对应的ln(t) ln(ln(1/(1-F)))用来拟合
 x_t = [np.log(dat[h-1]) for h in sel_n]
-print 'x_t is: '
 print x_t
-print x_t[0]
+
 y_t = [np.log(np.log(1.0/(1-i))) for i in Fnt]
 print y_t
 
@@ -79,15 +79,17 @@ def mul_2(z_,v_):
 x_ = avg_(x_t)
 y_ = avg_(y_t)
 
-#拟合对应的A和B值
+#拟合对应的A和B值 y=A_*x+B_
 A_ = (avg_(mul_2(x_t,y_t))-x_*y_)/(avg_(mul_(x_t))-x_*x_)
+print 'value A is:'
 print A_
+
 B_ = y_-A_*x_
+print 'value B is:'
 print B_
 #根据A和B值来计算这个曲线
 tmp_v = np.linspace(np.floor(x_t[0]),np.ceil(x_t[len(x_t)-1]),10)
 tmp_y = [A_*k+B_ for k in tmp_v]
-plt.figure(2)
 plt.plot(tmp_v,tmp_y)
 plt.show()
 
@@ -95,7 +97,8 @@ plt.show()
 def f_s(t,beta,yta,gama):
     tmp_v = (t-gama)/yta
     return (beta/yta)*((tmp_v)**(beta-1))*np.exp(-(tmp_v)**beta)
-
+def F_sum(t,beta,yta,gama):
+    return 1-np.exp(-((t-gama)/yta)**beta)
 t = np.linspace(0, 8000, 50)
 beta = A_
 yta = np.exp(-(B_/A_))
@@ -105,7 +108,7 @@ gama = 0
 
 F = []
 for tt in t:
-    F.append(f_s(tt,beta,yta,gama))
-
+    F.append(F_sum(tt,beta,yta,gama))
+plt.figure(4)
 plt.plot(t, F)
 plt.show()

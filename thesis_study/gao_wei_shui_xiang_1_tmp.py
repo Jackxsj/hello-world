@@ -8,36 +8,43 @@ Created on Sun Feb 26 10:04:14 2017
 import numpy as np
 
 import matplotlib.pyplot as plt
-
+#这个区别于gao_wei_shui_xiang主要是去除一些数据
 dat = []
 ex_dat = [460,824,150,264,938,1248,543,1378,1726,558,1988,548,2045,546,542,2234,2628,537,1901,3498]
-ex_dat.sort()
-for i in ex_dat:
-    dat.append(i)
+#不要sort，把这些间隔加起来
+#ex_dat.sort()
+
+for i in range(0,len(ex_dat)):
+    dat.append(ex_dat[i])
+
+
 
 dat_len = len(dat)
 
-x = [i for i in range(1,dat_len+1)]
-print 'ex_dat is here: '
-print ex_dat
+print 'dat is here: '
+print dat
     
 #test with select sequence, should begin with real number such as 1
 #案例中的求秩如果数据残缺可以用下面这种跳位方式计算
-#sel_n = [1,4,6,10,11,13,16,18,20,23,25,27,30]
+sel_n = [1,2,5,6,8,9,11,13,16,17]
 #不跳位，直接计算
-sel_n = [n for n in range(1,dat_len+1)]
+#sel_n = [n for n in range(1,dat_len+1)]
+print [dat[i-1] for i in sel_n]
 
 #计算实际的在list中的下标
 y = [ j for j in range(0,len(sel_n))]
 
 A_exp = []
 #按照改进的中位秩公式来计算对应的秩次
+last_in = 0
 for l in y:
     if l==0:
         A_exp.append(1)
     else:
         m = A_exp[l-1]+(len(dat)+1-A_exp[l-1])/(len(dat)-sel_n[l]+2.0)
         A_exp.append(m)
+print 'A_exp value is :'
+print A_exp
 
 #用经验公式来计算Fn(t)来找到对应的概率
 Fnt = []
@@ -49,8 +56,9 @@ print Fnt
 x_t = [np.log(dat[h-1]) for h in sel_n]
 print 'x_t is: '
 print x_t
-print x_t[0]
+
 y_t = [np.log(np.log(1.0/(1-i))) for i in Fnt]
+print 'y_t is: '
 print y_t
 
 plt.figure(2)
@@ -81,13 +89,16 @@ y_ = avg_(y_t)
 
 #拟合对应的A和B值
 A_ = (avg_(mul_2(x_t,y_t))-x_*y_)/(avg_(mul_(x_t))-x_*x_)
+print 'value A is:'
 print A_
+
 B_ = y_-A_*x_
+print 'value B is:'
 print B_
 #根据A和B值来计算这个曲线
 tmp_v = np.linspace(np.floor(x_t[0]),np.ceil(x_t[len(x_t)-1]),10)
 tmp_y = [A_*k+B_ for k in tmp_v]
-plt.figure(2)
+
 plt.plot(tmp_v,tmp_y)
 plt.show()
 
@@ -95,6 +106,8 @@ plt.show()
 def f_s(t,beta,yta,gama):
     tmp_v = (t-gama)/yta
     return (beta/yta)*((tmp_v)**(beta-1))*np.exp(-(tmp_v)**beta)
+def F_sum(t,beta,yta,gama):
+    return 1-np.exp(-((t-gama)/yta)**beta)
 
 t = np.linspace(0, 8000, 50)
 beta = A_
@@ -105,7 +118,7 @@ gama = 0
 
 F = []
 for tt in t:
-    F.append(f_s(tt,beta,yta,gama))
+    F.append(F_sum(tt,beta,yta,gama))
 
 plt.plot(t, F)
 plt.show()
