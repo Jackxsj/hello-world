@@ -8,7 +8,7 @@ from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import PolynomialFeatures  
 from sklearn import linear_model  
 #http://blog.csdn.net/lsldd/article/details/41251583
-    ''''' 数据生成 '''  
+    # 数据生成 
     x = np.arange(0, 1, 0.002)  
     y = norm.rvs(0, size=500, scale=0.1)  
     y = y + x**2  

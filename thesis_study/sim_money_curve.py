@@ -27,6 +27,7 @@ T_t = []
 
 l=0
 point=[]
+small_point = 0
 for i in x_t:
     l_tmp=0.05*i+random.uniform(0,1)/10
     T_avg.append(T/i)
@@ -35,7 +36,7 @@ for i in x_t:
     j = (T/i)+(l/i)
     if i >1:
         if j>T_t[i-2]:    
-            point.append([i-1,T_t[i-2]])
+            point.append([i-1,T_t[i-2]]) #find the smallest point
     T_t.append(j)
     
 
@@ -52,15 +53,18 @@ s.decode('gbk', 'replace')
 print s
 
 plt.plot(x_t,T_avg,'--',label=u'初始投资年平均')
-plt.plot(x_t,T_m,'-.',label=u'维护费用年平均')
+plt.plot(x_t,T_m,'-.',label=u'运行维护费用年平均')
 plt.plot(x_t,T_t,'-',label=u'年平均成本')
 plt.plot(x_conf,y_conf,'r:')
-plt.legend(loc='upper left')
-plt.xlabel(u'时间')
+plt.legend(loc='upper right')
+#plt.xlabel(u'时间')
 plt.ylabel(u'成本')
+plt.xticks([point[0][0],x_t[-1]],
+          [u'经济寿命',u'时间'])
+plt.yticks([], [])
 
-
-plt.title(u'LCC年均成本')
+#LCC年均成本
+#plt.title(u'')
 plt.show()
 
 

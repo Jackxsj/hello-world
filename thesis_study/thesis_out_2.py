@@ -3,16 +3,19 @@ from __future__ import division
 import random
 import numpy as np
 import matplotlib.pyplot as plt
+
+import xlwt
 #测试t(r)
 #测试输入数据
 #‘基于新的威布尔参数估计法’
 #这个输入yta,beta,以及阈值后来进行判断
 
-ceshi_gao_wei_shui_xiang_1_tmp = [1.91938132137,2718.20937555,8760]
+ceshi_gao_wei_shui_xiang = [1.95439665774,2971.00995466,8760]
+ceshi_bian_ping_qi = [1.85308843765,2696.57986518,8760]
 ceshi_gao_wei_shui_xiang_from_paper = [2.608,2.202,1]
 ceshi_paper_wei_bu_er_yingyong = [1.1,22.8,1]
 #[beta,yta,threshold]
-all_val = ceshi_paper_wei_bu_er_yingyong
+all_val = ceshi_bian_ping_qi
 
 beta =  all_val[0]
 yta = all_val[1]
@@ -37,10 +40,11 @@ for j in last_t:
     print str(j[0])+'<---->'+str(j[1])+'<---->'+str(j[2])+'<---->'+str(j[3])
 
 total_y = 15
+total_sim_times = 10000
 year_repair = [0 for i in range(0,total_y)]
 print year_repair
 cmp_year = [i*threshold for i in range(1,total_y+1)]
-for i in range(0,10000):
+for i in range(0,total_sim_times):
     t=0
     while t<cmp_year[-1]:
         tmp_val = random.uniform(0,1)
@@ -53,6 +57,32 @@ for i in range(0,10000):
                 break;
 print year_repair
 #一年的时间会覆盖所有的故障点，所以故障会发生几次
+
+###########下面为输出到excel
+def set_style(name,height,bold=False): 
+  style = xlwt.XFStyle() # 初始化样式 
+  font = xlwt.Font() # 为样式创建字体 
+  font.name = name # 'Times New Roman' 
+  font.bold = bold 
+  font.color_index = 4
+  font.height = height
+  style.font = font 
+  # style.borders = borders 
+  return style
+
+#设置这个工作薄
+wbk = xlwt.Workbook()
+#设置这个sheet,所有的操作，都是在sheet上进行的
+sheet1 = wbk.add_sheet('test1',cell_overwrite_ok=True)
+
+row_j=1
+for ii in range(0,total_y):
+    sheet1.write(row_j,0,ii+1,set_style('Arial',220,False))
+    sheet1.write(row_j,1,year_repair[ii],set_style('Arial',220,False))
+    sheet1.write(row_j,2,year_repair[ii]/total_sim_times,set_style('Arial',220,False))
+    row_j=row_j+1
+sek = 'issue2'
+wbk.save('%s.xlsx' %sek)
 
 #因为故障全覆盖的时间段小于一年的话可能会出现一年重复几次的情况，因此需要根据累加一年出现概率的情况
 def F_sum(t,beta,yta,gama):

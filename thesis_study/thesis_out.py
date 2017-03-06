@@ -8,52 +8,58 @@ Created on Sun Feb 26 10:04:14 2017
 import numpy as np
 
 import matplotlib.pyplot as plt
+import xlwt
+import xlrd
 #这个区别于gao_wei_shui_xiang主要是去除一些数据
-dat = []
-ex_dat = [460,824,150,264,938,1248,543,1378,1726,558,1988,548,2045,546,542,2234,2628,537,1901,3498]
+#ex_dat = [460,824,150,264,938,1248,543,1378,1726,558,1988,548,2045,546,542,2234,2628,537,1901,3498]
+ex_dat = [422,890,987,975,1098,980,1420,954,1678,2174,2354,970,998,2425,890,2819,975,3310,9186,5058]
 #不要sort，把这些间隔加起来
 ex_dat.sort()
 
-for i in range(0,len(ex_dat)):
-    dat.append(ex_dat[i])
+ex_tmp = [[i+1, ex_dat[i]] for i in range(0, len(ex_dat))]
 
+    
+#test with select sequence, should begin with real number such as 1
+#案例中的求秩如果数据残缺可以用下面这种跳位方式计算
+#for container
+sel_n = [3,10,11,12,13,14,16,17,18,19]
+#for motor
+#sel_n = [1,9,11,12,13,14,15,16,17,18]
+#不跳位，直接计算
+#sel_n = [n for n in range(1,len(ex_dat)+1)]
 
-
+dat = []
+for i in sel_n:
+    dat.append(ex_dat[i-1])
 dat_len = len(dat)
 
 print 'dat is here: '
 print dat
-    
-#test with select sequence, should begin with real number such as 1
-#案例中的求秩如果数据残缺可以用下面这种跳位方式计算
-#sel_n = [1,2,5,6,8,9,11,13,16,17]
-#不跳位，直接计算
-sel_n = [n for n in range(1,dat_len+1)]
-print [dat[i-1] for i in sel_n]
 
-#计算实际的在list中的下标
-y = [ j for j in range(0,len(sel_n))]
+
+#计算在list中的下标
+y_list = [ j for j in range(0,len(sel_n))]
 
 A_exp = []
 #按照改进的中位秩公式来计算对应的秩次
 last_in = 0
-for l in y:
+for l in y_list:
     if l==0:
         A_exp.append(1)
     else:
-        m = A_exp[l-1]+(len(dat)+1-A_exp[l-1])/(len(dat)-sel_n[l]+2.0)
+        m = A_exp[l-1]+(len(ex_dat)+1-A_exp[l-1])/(len(ex_dat)-sel_n[l]+2.0)
         A_exp.append(m)
 print 'A_exp value is :'
 print A_exp
 
 #用经验公式来计算Fn(t)来找到对应的概率
 Fnt = []
-for n in y:
-    Fnt.append((A_exp[n]-0.3)/(len(dat)+0.4))
+for n in y_list:
+    Fnt.append((A_exp[n]-0.3)/(len(ex_dat)+0.4))
 print 'Fnt is here:'
 print Fnt
 #来计算对应的ln(t) ln(ln(1/(1-F)))用来拟合
-x_t = [np.log(dat[h-1]) for h in sel_n]
+x_t = [np.log(dat[h]) for h in y_list]
 print 'x_t is: '
 print x_t
 
@@ -122,3 +128,32 @@ for tt in t:
 
 plt.plot(t, F)
 plt.show()
+
+###########下面为输出到excel
+def set_style(name,height,bold=False): 
+  style = xlwt.XFStyle() # 初始化样式 
+  font = xlwt.Font() # 为样式创建字体 
+  font.name = name # 'Times New Roman' 
+  font.bold = bold 
+  font.color_index = 4
+  font.height = height
+  style.font = font 
+  # style.borders = borders 
+  return style
+
+#设置这个工作薄
+wbk = xlwt.Workbook()
+#设置这个sheet,所有的操作，都是在sheet上进行的
+sheet1 = wbk.add_sheet('test1',cell_overwrite_ok=True)
+
+row_j=1
+for ii in y_list:
+    sheet1.write(row_j,0,ii+1,set_style('Arial',220,False))
+    sheet1.write(row_j,1,dat[ii],set_style('Arial',220,False))
+    sheet1.write(row_j,2,A_exp[ii],set_style('Arial',220,False))
+    sheet1.write(row_j,3,Fnt[ii],set_style('Arial',220,False))
+    sheet1.write(row_j,4,x_t[ii],set_style('Arial',220,False))
+    sheet1.write(row_j,5,y_t[ii],set_style('Arial',220,False))
+    row_j=row_j+1
+sek = 'issue'
+wbk.save('%s.xlsx' %sek)
