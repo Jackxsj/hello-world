@@ -12,10 +12,12 @@ import xlwt
 
 ceshi_gao_wei_shui_xiang = [1.95439665774,2971.00995466,8760]
 ceshi_bian_ping_qi = [1.85308843765,2696.57986518,8760]
+ceshi_hunhe_fang_shi = [2.03441705357,1955.85958539,8760]
+
 ceshi_gao_wei_shui_xiang_from_paper = [2.608,2.202,1]
 ceshi_paper_wei_bu_er_yingyong = [1.1,22.8,1]
 #[beta,yta,threshold]
-all_val = ceshi_bian_ping_qi
+all_val = ceshi_hunhe_fang_shi
 
 beta =  all_val[0]
 yta = all_val[1]

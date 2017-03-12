@@ -10,23 +10,27 @@ import numpy as np
 import matplotlib.pyplot as plt
 import xlwt
 import xlrd
-#这个区别于gao_wei_shui_xiang主要是去除一些数据
-#ex_dat = [460,824,150,264,938,1248,543,1378,1726,558,1988,548,2045,546,542,2234,2628,537,1901,3498]
-ex_dat = [422,890,987,975,1098,980,1420,954,1678,2174,2354,970,998,2425,890,2819,975,3310,9186,5058]
-#不要sort，把这些间隔加起来
-ex_dat.sort()
-
-ex_tmp = [[i+1, ex_dat[i]] for i in range(0, len(ex_dat))]
-
-    
 #test with select sequence, should begin with real number such as 1
 #案例中的求秩如果数据残缺可以用下面这种跳位方式计算
-#for container
-sel_n = [3,10,11,12,13,14,16,17,18,19]
-#for motor
+
+#这个区别于gao_wei_shui_xiang主要是去除一些数据
+#ex_dat = [460,824,150,264,938,1248,543,1378,1726,558,1988,548,2045,546,542,2234,2628,537,1901,3498]
+#sel_n = [3,10,11,12,13,14,16,17,18,19]
+
+#变频泵的计算
+#ex_dat = [422,890,987,975,1098,980,1420,954,1678,2174,2354,970,998,2425,890,2819,975,3310,9186,5058]
 #sel_n = [1,9,11,12,13,14,15,16,17,18]
-#不跳位，直接计算
-#sel_n = [n for n in range(1,len(ex_dat)+1)]
+
+#混合计算
+ex_dat = [460,824,938,1248,1378,1726,1988,2045,2234,2628,422,987,1098,1420,1678,2174,2354,2425,2819,3310]
+#不需要从中选取，即所有数据有效
+sel_n = [n for n in range(1,len(ex_dat)+1)]
+
+
+ex_dat.sort()
+ex_tmp = [[i+1, ex_dat[i]] for i in range(0, len(ex_dat))]
+print ex_tmp
+    
 
 dat = []
 for i in sel_n:
