@@ -21,6 +21,17 @@ class opExcel:
       style.font = font 
       # style.borders = borders 
       return style
+    def exportTest(self):
+        data = xlwt.Workbook()
+        sheet = data.add_sheet(u'测试结果') 
+        j=1
+        
+        for j in range(1,32):
+            color = self.set_style('Times New Roman',220,j+1,False)
+            sheet.write(j,0,j,color)
+        outFileName = u'test.xls' 
+        data.save(outFileName)
+             
     def importExcel(self):
         data = xlrd.open_workbook(self.fileName)
         sheet = data.sheets()[0]
@@ -111,7 +122,5 @@ def reqTest(values):
             
 
 a=opExcel();
-b=a.importExcel()
-for tmpValue in b:
-    reqTest(tmpValue)
-a.exportExcel(b)
+a.exportTest();
+

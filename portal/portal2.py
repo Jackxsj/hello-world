@@ -5,39 +5,19 @@ import time
 from ctypes import c_uint32
 import hashlib
 
-import mysql.connector
-import numpy as np
 #仅在生成的时候用，生成的data.txt需要提供给jemeter使用
-def readFromMysql():
-    conn = mysql.connector.connect(user="jfwx", password="jiANfEi_wxm2015", 
-                                   host="192.168.1.5", database="db_user")
-    cur = conn.cursor()
-    cur.execute("select usermac from jf_old_user where id <3")
-    
-    file_path="data.txt"
-    f=open(file_path, "w")
-    
-    for i in cur:
-        x0 = np.random.randint(1,254)
-        x1 = np.random.randint(1,254)
-        x2 = np.random.randint(1,254)
-        x3 = np.random.randint(1,254) 
-        line = i[0]+","+str(x0)+"."+str(x1)+"."+str(x2)+"."+str(x3)
-        f.write(line)
-        f.write('\n')
-
-        
-    f.close()
-    cur.close()
-    print("done and close")
 
 def readFromFile():
-    file_path="data.txt"
-    f=open(file_path, "w")
+    file_path="data2.txt"
+    f=open(file_path, "r")
     arpTable = {}
     for i in f.readlines():
         tmp = i.split(',')
-        arpTable[tmp[1]]=tmp[0]
+        print(tmp)
+        tmp_req_id = [int(int(tmp[2])/256),int(tmp[2])%256]
+        print(tmp_req_id)
+        tmp_challenge = tmp[3].split(".")
+        arpTable[tmp[1]]=[tmp[0],tmp_req_id,[int(xval) for xval in tmp_challenge],tmp[4]]
     return arpTable
 
 def udplink(sock):
@@ -118,23 +98,29 @@ while True:
         break
     tmp_data = data
     
-    for b in tmp_data:
-        print(b)
-    req_id = ["00","17"]
-    packet_id = ["6c"]
-    challenge_val = ["eb","df","1a","d7","bb","69","94","c2","f2","4d","52","73","ef","6d","0b","2e"]
-    challenge_val_int =[]
-    for i in challenge_val:
-        challenge_val_int.append(get2CharacterHex(i))
+    
+    frame_ip = tmp_data[8:12]
+    
+    tmp_ip = ""
+    for i in frame_ip :
+        tmp_ip = tmp_ip+str(i)+"."
+    tmp_ip = tmp_ip[:-1]
+
+    req_id = arpTable[tmp_ip][1] #采用在数据库存储的id值
+    print("req_id val  ","")
+    print(req_id)
+    packet_id = req_id[1]  #采用数据库存储的id值得低8位
+    challenge_val_int = arpTable[tmp_ip][2]
+    
     service_type = [0,0,0,2]
     frame_protocal = [0,0,0,1]
-    frame_ip = [29,127,255,253]
-    mac_val = b"203c-aeac-0df9"
+    
+    mac_val = arpTable[tmp_ip][0]
     nas_type_val = [0,0,0,19]
     nas_port_val = b"slot=0;subslot=0;port=0;vlanid=92"
-    called_station_val = b"FC-B6-98-F8-FB-20:92"
+    called_station_val = (mac_val+":92").encode("utf-8")
     nas_ip = [192,168,1,8]
-    accounting_id = b"19840000000000009229d96c00000bf"
+    accounting_id = arpTable[tmp_ip][3].encode("utf-8")
     
     if tmp_data[1] == 1:
         ack_challenge = bytearray()
@@ -146,13 +132,13 @@ while True:
         #rsvID为带过来的值
         ack_challenge.append(tmp_data[3])
         #直接把serial no 拷贝过来
-        ack_challenge.append(tmp_data[4:6])
+        ack_challenge.extend(tmp_data[4:6])
         
         #这里的这个req_id值后面需要变化,2个字节，现在设置为全局值
-        #req_id值这里采用的规则为 ip地址后两位
-        for j in req_id:
-            i = get2CharacterHex(j)
-            ack_challenge.append(i)
+        #req_id值这里采用的规则为 ip地址后两位，即tmp_data的内容
+        ack_challenge.extend(req_id)
+        
+        #ip地址
         for i in tmp_data[8:12]:
             ack_challenge.append(i)
         #userport 2个字节
@@ -163,6 +149,8 @@ while True:
         #attrnum 为1
         ack_challenge.append(1)
         #tlv challenge ack挑战值在外部被随机生成好，后面access_request需要使用
+        #这个challenge val的计算规则
+        
         ack_challenge.append(3)
         ack_challenge.append(18)
         ack_challenge.extend(challenge_val_int)
@@ -185,9 +173,8 @@ while True:
         acct_req.append(4)
         
         #packet id
-        i = get2CharacterHex(packet_id[0])
-        access_req.append(i)
-        acct_req.append(i)
+        access_req.append(packet_id)
+        acct_req.append(packet_id)
         #这个整个的长度len需要后面再重新定值
         access_req.append(0)
         access_req.append(0)
@@ -215,7 +202,7 @@ while True:
         #添加chap_password
         access_req.append(3)
         access_req.append(19)
-        access_req.append(get2CharacterHex(req_id[1]))
+        access_req.append(req_id[1])
         access_req.extend(tmp_dict[4])
         
         #添加challenge值
@@ -252,12 +239,12 @@ while True:
         
         #添加calling-station-id,后面需要扩展
         access_req.append(31)
-        access_req.append(16)    
-        access_req.extend(mac_val)
+        access_req.append(len(mac_val)+2)    
+        access_req.extend(mac_val.encode("utf-8"))
         
         acct_req.append(31)
-        acct_req.append(16)    
-        acct_req.extend(mac_val)
+        acct_req.append(len(mac_val)+2)    
+        acct_req.extend(mac_val.encode("utf-8"))
         
         #添加nas-port-type,后面需要扩展
         access_req.append(61)
