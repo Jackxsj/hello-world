@@ -44,7 +44,8 @@ def readFromMysql():
     
     
     cur = conn.cursor()
-    cur.execute("select * from jf_old_user where id >000000 and id <0001000 and business_id = 1115")
+    
+    cur.execute("select * from jf_old_user where id >000700 and id <0001000 and business_id = 1115")
     
     file_path="data.txt"
     file_path2="data2.txt"
@@ -89,7 +90,7 @@ def readFromMysql():
         
         
         tmp_con = tmp_con + 1
-        if tmp_con > 10:
+        if tmp_con > 200:
             break
         
     f.close()

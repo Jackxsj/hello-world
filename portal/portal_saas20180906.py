@@ -61,11 +61,11 @@ def get2CharacterHex(tmp_s):
 
 def radiusAuth(tmp_b,tmp_acct):
     r=socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
-    r.sendto(tmp_b,("192.168.1.5",1812))
+    r.sendto(tmp_b,(radius_server[0],radius_server[1]))
 
     data,addr=r.recvfrom(1024)   
     if data[0] == 2:
-        r.sendto(tmp_acct,("192.168.1.5",1813))
+        r.sendto(tmp_acct,(radius_server[0],radius_server[2]))
         data1,addr1=r.recvfrom(1024)
         r.close()
         return 0
@@ -101,8 +101,8 @@ def constructAckChallenge(tmp_data,req_id,challenge_val_int):
     #attrnum 为1
     ack_challenge.append(1)
     #tlv challenge ack挑战值在外部被随机生成好，后面access_request需要使用
-    #这个challenge val的计算规则
-    
+    '''这个challenge val的计算规则 !!!!  version 1把这个多的16字节取消'''
+    ack_challenge.extend([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15])
     ack_challenge.append(3)
     ack_challenge.append(18)
     ack_challenge.extend(challenge_val_int)
@@ -114,8 +114,8 @@ def constructRadius(tmp_data,mac_val,packet_id,challenge_val_int,req_id,frame_ip
     frame_protocal = [0,0,0,1]
     nas_type_val = [0,0,0,19]
     nas_ip = [192,168,1,8]
-    called_station_val = (mac_val+":200").encode("utf-8")   
-    nas_port_val = b"slot=0;subslot=0;port=0;vlanid=200"
+    called_station_val = (mac_val+":201").encode("utf-8")   
+    nas_port_val = b"slot=0;subslot=0;port=0;vlanid=201"
  
     
     tmp_dict = {}
@@ -334,8 +334,15 @@ class MyUDPHandler(socketserver.BaseRequestHandler):
             else:
                 tmp_acc = arpTable[tmp_ip][3]+str(int(time.time()))
                 accounting_id=tmp_acc.encode("utf-8")
+                
+            '''!!!!!version2 不一样增加了16字节，如果
+            不是这个，把tmp_data直接用在constructRadius上就好
+            '''
+            tmp_data_radius=[]
+            tmp_data_radius.extend(tmp_data[0:16])
+            tmp_data_radius.extend(tmp_data[32:])
             
-            access_req,acct_req=constructRadius(tmp_data,mac_val,packet_id,challenge_val_int,req_id,frame_ip,accounting_id)       
+            access_req,acct_req=constructRadius(tmp_data_radius,mac_val,packet_id,challenge_val_int,req_id,frame_ip,accounting_id)       
             if 0 == radiusAuth(access_req,acct_req):
                 ack_auth = bytearray()
                 ack_auth.extend(tmp_data[0:16])
@@ -357,7 +364,8 @@ arpTable = readFromFile()
 HOST = '192.168.1.8'
 PORT = 2000
 
-portal_server = ('192.168.1.5',50100)
+portal_server = ('192.168.1.54',50100)
+radius_server = ["192.168.1.54",1812,1813]
 
 server = socketserver.ThreadingUDPServer((HOST,PORT),MyUDPHandler)
 server.serve_forever()
